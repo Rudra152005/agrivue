@@ -64,7 +64,7 @@ pipeline {
 
         stage('Push Images') {
             steps {
-                // Example for pushing to Nexus/DockerHub
+                echo 'Skipping image push — configure DOCKER_REGISTRY to enable'
                 // sh 'docker tag frontend:latest ${DOCKER_REGISTRY}/frontend:latest'
                 // sh 'docker push ${DOCKER_REGISTRY}/frontend:latest'
             }
