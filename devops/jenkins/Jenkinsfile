@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "nexus:8082" // Example Nexus Docker registry
+        DOCKER_REGISTRY = "nexus:8082"
         SONAR_TOKEN = credentials('sonarqube-token')
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
     }
@@ -17,10 +17,10 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('Frontend') {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
                 dir('backend') {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -28,10 +28,10 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('backend') {
-                    sh 'npm test -- --watchAll=false'
+                    bat 'npm test -- --watchAll=false'
                 }
                 dir('Frontend') {
-                    sh 'npm run lint'
+                    bat 'npm run lint'
                 }
             }
         }
@@ -41,7 +41,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv('SonarQubeServer') {
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        bat "${scannerHome}\\bin\\sonar-scanner.bat"
                     }
                 }
             }
@@ -57,29 +57,29 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t frontend:latest ./devops/docker/frontend'
-                sh 'docker build -t backend:latest ./devops/docker/backend'
+                bat 'docker build -t frontend:latest ./devops/docker/frontend'
+                bat 'docker build -t backend:latest ./devops/docker/backend'
             }
         }
 
         stage('Push Images') {
             steps {
                 echo 'Skipping image push — configure DOCKER_REGISTRY to enable'
-                // sh 'docker tag frontend:latest ${DOCKER_REGISTRY}/frontend:latest'
-                // sh 'docker push ${DOCKER_REGISTRY}/frontend:latest'
+                // bat 'docker tag frontend:latest %DOCKER_REGISTRY%/frontend:latest'
+                // bat 'docker push %DOCKER_REGISTRY%/frontend:latest'
             }
         }
 
         stage('Deploy Containers') {
             steps {
-                sh 'docker-compose -f devops/docker-compose.yml up -d'
+                bat 'docker-compose -f devops/docker-compose.yml up -d'
             }
         }
 
         stage('Health Check') {
             steps {
                 script {
-                    def status = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:80", returnStdout: true).trim()
+                    def status = bat(script: 'curl -s -o NUL -w "%%{http_code}" http://localhost:80', returnStdout: true).trim()
                     if (status != '200') {
                         error "Health check failed with status ${status}"
                     }
@@ -94,11 +94,10 @@ pipeline {
         }
         success {
             echo 'Deployment successful!'
-            // slackSend channel: '#deployments', message: "Agri-TrekOps deployed successfully!"
         }
         failure {
             echo 'Deployment failed!'
-            // sh 'docker-compose -f devops/docker-compose.yml rollback' // Custom rollback logic
         }
     }
 }
+
