@@ -1,0 +1,33 @@
+FROM jenkins/jenkins:lts-jdk17
+
+USER root
+
+# Install Docker CLI (More robust method for Debian)
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl gnupg && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    chmod a+r /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
+
+# Add jenkins user to docker group (using common gid 999 for host docker)
+RUN groupadd -g 999 docker_host || true && \
+    usermod -aG docker_host jenkins || usermod -aG sudo jenkins
+
+USER jenkins
+
+# Pre-install plugins
+RUN jenkins-plugin-cli --plugins \
+    docker-workflow \
+    git \
+    nodejs \
+    sonar \
+    credentials-binding \
+    workflow-aggregator

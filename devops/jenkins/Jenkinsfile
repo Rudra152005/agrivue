@@ -1,0 +1,104 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = "nexus:8082" // Example Nexus Docker registry
+        SONAR_TOKEN = credentials('sonarqube-token')
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
+    }
+
+    stages {
+        stage('GitHub Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/user/agri-trekops.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('Frontend') {
+                    sh 'npm install'
+                }
+                dir('backend') {
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                dir('backend') {
+                    sh 'npm test -- --watchAll=false'
+                }
+                dir('Frontend') {
+                    sh 'npm run lint'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv('SonarQubeServer') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t frontend:latest ./devops/docker/frontend'
+                sh 'docker build -t backend:latest ./devops/docker/backend'
+            }
+        }
+
+        stage('Push Images') {
+            steps {
+                // Example for pushing to Nexus/DockerHub
+                // sh 'docker tag frontend:latest ${DOCKER_REGISTRY}/frontend:latest'
+                // sh 'docker push ${DOCKER_REGISTRY}/frontend:latest'
+            }
+        }
+
+        stage('Deploy Containers') {
+            steps {
+                sh 'docker-compose -f devops/docker-compose.yml up -d'
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    def status = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:80", returnStdout: true).trim()
+                    if (status != '200') {
+                        error "Health check failed with status ${status}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Deployment successful!'
+            // slackSend channel: '#deployments', message: "Agri-TrekOps deployed successfully!"
+        }
+        failure {
+            echo 'Deployment failed!'
+            // sh 'docker-compose -f devops/docker-compose.yml rollback' // Custom rollback logic
+        }
+    }
+}

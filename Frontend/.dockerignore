@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.git
+.gitignore
+*.md
+.lovable
+.tanstack
+bun.lock
+package-lock.json
+wrangler.jsonc
+docker-compose.yml
+Dockerfile

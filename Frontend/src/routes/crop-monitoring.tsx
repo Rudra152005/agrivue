@@ -1,0 +1,62 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { Sprout, Droplets, Sun, ThermometerSun } from "lucide-react";
+import { StatCard } from "@/components/ui-kit/StatCard";
+import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { motion } from "framer-motion";
+
+export const Route = createFileRoute("/crop-monitoring")({
+  head: () => ({ meta: [{ title: "Crop Monitoring — Agri-TrekOps" }] }),
+  component: CropMonitoring,
+});
+
+const data = Array.from({length:14}).map((_,i)=>({d:`D${i+1}`,ndvi:60+Math.round(Math.sin(i/2)*15+i)}));
+
+function CropMonitoring() {
+  return (
+    <AppLayout title="Crop Monitoring">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="NDVI Avg" value={78} suffix="%" icon={Sprout} accent="primary"/>
+        <StatCard label="Soil Moisture" value={67} suffix="%" icon={Droplets} accent="info"/>
+        <StatCard label="Sunlight" value={812} suffix=" lx" icon={Sun} accent="warning"/>
+        <StatCard label="Temperature" value={28} suffix="°C" icon={ThermometerSun} accent="destructive"/>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 glass rounded-2xl p-5">
+          <h3 className="font-semibold">NDVI trend · last 14 days</h3>
+          <div className="h-72 mt-3">
+            <ResponsiveContainer>
+              <LineChart data={data}>
+                <CartesianGrid stroke="oklch(1 0 0 / 0.05)" vertical={false}/>
+                <XAxis dataKey="d" stroke="oklch(0.68 0.02 150)" fontSize={11} tickLine={false} axisLine={false}/>
+                <YAxis stroke="oklch(0.68 0.02 150)" fontSize={11} tickLine={false} axisLine={false}/>
+                <Tooltip contentStyle={{ background:"oklch(0.16 0.02 160)", border:"1px solid oklch(0.30 0.03 160)", borderRadius: 12 }}/>
+                <Line type="monotone" dataKey="ndvi" stroke="oklch(0.85 0.20 145)" strokeWidth={3} dot={{r:4}}/>
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="glass rounded-2xl p-5">
+          <h3 className="font-semibold">Active alerts</h3>
+          <ul className="mt-4 space-y-3 text-sm">
+            {[
+              { c:"warning", t:"Moisture dropping in Sector 9", d:"2h ago" },
+              { c:"destructive", t:"Pest signal · Cotton field 4", d:"4h ago" },
+              { c:"info", t:"Survey scheduled · Sector 7", d:"6h ago" },
+              { c:"success", t:"NDVI recovered in Sector 4", d:"1d ago" },
+            ].map((a,i)=>(
+              <motion.li key={i} initial={{opacity:0,x:-8}} animate={{opacity:1,x:0}} transition={{delay:i*0.05}} className="glass rounded-xl p-3">
+                <div className="flex justify-between items-center">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${a.c==="warning"?"bg-warning/15 text-warning":a.c==="destructive"?"bg-destructive/15 text-destructive":a.c==="info"?"bg-info/15 text-info":"bg-success/15 text-success"}`}>{a.c}</span>
+                  <span className="text-xs text-muted-foreground">{a.d}</span>
+                </div>
+                <div className="mt-2">{a.t}</div>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </AppLayout>
+  );
+}
