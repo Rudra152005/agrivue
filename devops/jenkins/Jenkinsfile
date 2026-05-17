@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('GitHub Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/user/agri-trekops.git'
+                git branch: 'main', url: 'https://github.com/Rudra152005/agrivue.git'
             }
         }
 
