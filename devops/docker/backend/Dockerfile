@@ -6,14 +6,12 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 # Install PM2 globally
-RUN npm config set fetch-retry-mintimeout 20000 && \
-    npm config set fetch-retry-maxtimeout 120000 && \
-    npm config set registry http://registry.npmjs.org/ && \
+RUN npm config set registry https://registry.npmjs.org/ && \
     npm install -g pm2
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install --production --legacy-peer-deps
+RUN npm ci --omit=dev --legacy-peer-deps
 
 # Copy source code
 COPY . .
