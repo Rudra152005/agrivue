@@ -31,7 +31,10 @@ pipeline {
                     echo 'Skipping backend tests (no tests configured in backend)'
                 }
                 dir('Frontend') {
-                    bat 'npm run lint -- --fix || echo "Lint warnings found"'
+                    script {
+                        def lintStatus = bat(script: 'npm run lint -- --fix', returnStatus: true)
+                        echo "Lint stage finished with status: ${lintStatus}"
+                    }
                 }
             }
         }
