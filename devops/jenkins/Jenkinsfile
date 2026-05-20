@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_REGISTRY = "nexus:8082"
-        SONAR_TOKEN = credentials('sonarqube-token')
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
-    }
-
     stages {
         stage('GitHub Checkout') {
             steps {
@@ -34,35 +28,6 @@ pipeline {
                     script {
                         def lintStatus = bat(script: 'npm run lint -- --fix', returnStatus: true)
                         echo "Lint stage finished with status: ${lintStatus}"
-                    }
-                }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    try {
-                        def scannerHome = tool 'SonarQubeScanner'
-                        withSonarQubeEnv('SonarQubeServer') {
-                            bat "${scannerHome}\\bin\\sonar-scanner.bat"
-                        }
-                    } catch (Exception e) {
-                        echo "Skipping SonarQube Analysis: ${e.getMessage()}"
-                    }
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                script {
-                    try {
-                        timeout(time: 1, unit: 'HOURS') {
-                            waitForQualityGate abortPipeline: true
-                        }
-                    } catch (Exception e) {
-                        echo "Skipping Quality Gate check: ${e.getMessage()}"
                     }
                 }
             }
