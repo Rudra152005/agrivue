@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// In Docker: nginx proxies /api → backend:5000 (no need for absolute URL)
+// In Docker: nginx proxies /api → backend:9090 (no need for absolute URL)
 // Locally: falls back to direct backend URL
 const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 

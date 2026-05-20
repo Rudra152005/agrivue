@@ -20,7 +20,7 @@ COPY . .
 USER node
 
 # Expose backend port
-EXPOSE 5000
+EXPOSE 9090
 
 # Start the application with PM2
 CMD ["pm2-runtime", "server.js"]
