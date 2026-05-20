@@ -32,7 +32,7 @@ docker-compose up -d
 
 ### 4. Access Services
 - **Frontend/API**: [http://localhost](http://localhost)
-- **Jenkins**: [http://localhost:8080](http://localhost:8080)
+- **Jenkins**: [http://localhost:9090](http://localhost:9090)
 - **SonarQube**: [http://localhost:9000](http://localhost:9000)
 - **Nexus**: [http://localhost:8081](http://localhost:8081)
 - **Prometheus**: [http://localhost:9090](http://localhost:9090)

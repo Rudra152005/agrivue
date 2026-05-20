@@ -1,9 +1,10 @@
-import { Bell, Search, Menu } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Bell, Search, Menu, ArrowLeft } from "lucide-react";
+import { Link, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 
 export function Topbar({ title, onMenu }: { title: string; onMenu?: () => void }) {
+  const router = useRouter();
   const { data: user } = useQuery({
     queryKey: ["me"],
     queryFn: async () => {
@@ -18,6 +19,15 @@ export function Topbar({ title, onMenu }: { title: string; onMenu?: () => void }
         <div className="flex items-center gap-3">
           <button onClick={onMenu} className="lg:hidden p-2 rounded-lg hover:bg-accent/30">
             <Menu className="h-5 w-5" />
+          </button>
+          <button
+            id="topbar-back-btn"
+            onClick={() => router.history.back()}
+            className="p-2 rounded-xl glass glow-hover transition-all hover:scale-105 hover:text-primary"
+            title="Go back"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
             <h1 className="text-lg font-semibold text-foreground">{title}</h1>

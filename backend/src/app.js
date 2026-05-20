@@ -12,7 +12,13 @@ const errorHandler = require('./middleware/error');
 // Load env vars
 dotenv.config();
 
+// Passport config (must be after dotenv)
+const { passport } = require('./config/passport');
+
 const app = express();
+
+// Initialize passport
+app.use(passport.initialize());
 
 // Body parser
 app.use(express.json());

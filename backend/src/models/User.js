@@ -23,9 +23,21 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
     minlength: 3,
     select: false
+  },
+  oauthProvider: {
+    type: String,
+    enum: ['google', 'github', null],
+    default: null
+  },
+  oauthId: {
+    type: String,
+    default: null
+  },
+  avatar: {
+    type: String,
+    default: null
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
@@ -37,8 +49,8 @@ const UserSchema = new mongoose.Schema({
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
+  if (!this.password || !this.isModified('password')) {
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);

@@ -22,8 +22,14 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CropMonitoringRouteImport } from './routes/crop-monitoring'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AerialRouteImport } from './routes/aerial'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as IndexRouteImport } from './routes/index'
 
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
   '/analytics': typeof AnalyticsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
   '/farmers': typeof FarmersRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
   '/analytics': typeof AnalyticsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
   '/farmers': typeof FarmersRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
   '/analytics': typeof AnalyticsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
   '/farmers': typeof FarmersRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aerial'
     | '/analytics'
+    | '/auth/callback'
     | '/crop-monitoring'
     | '/dashboard'
     | '/farmers'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aerial'
     | '/analytics'
+    | '/auth/callback'
     | '/crop-monitoring'
     | '/dashboard'
     | '/farmers'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aerial'
     | '/analytics'
+    | '/auth/callback'
     | '/crop-monitoring'
     | '/dashboard'
     | '/farmers'
@@ -199,6 +211,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AerialRoute: typeof AerialRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   CropMonitoringRoute: typeof CropMonitoringRoute
   DashboardRoute: typeof DashboardRoute
   FarmersRoute: typeof FarmersRoute
@@ -319,6 +332,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AerialRoute: AerialRoute,
   AnalyticsRoute: AnalyticsRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   CropMonitoringRoute: CropMonitoringRoute,
   DashboardRoute: DashboardRoute,
   FarmersRoute: FarmersRoute,

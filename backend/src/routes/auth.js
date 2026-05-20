@@ -8,6 +8,7 @@ const {
 const router = express.Router();
 
 const { protect } = require('../middleware/auth');
+const { passport, FRONTEND_URL } = require('../config/passport');
 
 /**
  * @swagger
@@ -60,4 +61,27 @@ router.post('/register', register);
 router.post('/login', login);
 router.get('/me', protect, getMe);
 
+// ─── Google OAuth ──────────────────────────────────────────────────────────
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+
+router.get('/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/auth/callback?error=${encodeURIComponent('Google login failed')}` }),
+  (req, res) => {
+    const token = req.user.getSignedJwtToken();
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
+  }
+);
+
+// ─── GitHub OAuth ──────────────────────────────────────────────────────────
+router.get('/github', passport.authenticate('github', { scope: ['user:email'], session: false }));
+
+router.get('/github/callback',
+  passport.authenticate('github', { session: false, failureRedirect: `${FRONTEND_URL}/auth/callback?error=${encodeURIComponent('GitHub login failed')}` }),
+  (req, res) => {
+    const token = req.user.getSignedJwtToken();
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
+  }
+);
+
 module.exports = router;
+

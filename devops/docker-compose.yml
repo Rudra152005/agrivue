@@ -57,8 +57,10 @@ services:
     build:
       context: ./docker/jenkins
     container_name: agri-jenkins
+    environment:
+      - JENKINS_OPTS=--httpPort=9090
     ports:
-      - "18080:8080"
+      - "19090:9090"
       - "50000:50000"
     volumes:
       - jenkins-data:/var/jenkins_home
