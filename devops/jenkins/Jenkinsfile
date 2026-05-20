@@ -71,15 +71,6 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                try {
-                    cleanWs()
-                } catch (Throwable t) {
-                    echo "Skipping workspace cleanup: ${t.getMessage()}"
-                }
-            }
-        }
         success {
             echo 'Deployment successful!'
         }

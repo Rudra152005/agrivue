@@ -11,7 +11,7 @@ RUN npm config set registry https://registry.npmjs.org/ && \
 
 # Install dependencies (do NOT set NODE_ENV=production yet so devDependencies are installed)
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .

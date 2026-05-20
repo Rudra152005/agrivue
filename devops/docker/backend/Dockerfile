@@ -11,7 +11,7 @@ RUN npm config set registry https://registry.npmjs.org/ && \
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev --legacy-peer-deps
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copy source code
 COPY . .
