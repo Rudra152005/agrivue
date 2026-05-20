@@ -4,12 +4,14 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Set network timeout and registry to prevent hang
-RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set fetch-retries 10 && \
+    npm config set fetch-retry-mintimeout 20000 && \
+    npm config set fetch-retry-maxtimeout 120000
 
 # Install dependencies (do NOT set NODE_ENV=production yet so devDependencies are installed)
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps && \
-    npm install react-is --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .

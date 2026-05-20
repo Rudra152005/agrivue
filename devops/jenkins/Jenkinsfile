@@ -70,8 +70,8 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                bat 'docker build -t frontend:latest -f ./devops/docker/frontend/Dockerfile ./Frontend'
-                bat 'docker build -t backend:latest -f ./devops/docker/backend/Dockerfile ./backend'
+                bat 'docker build --network=host -t frontend:latest -f ./devops/docker/frontend/Dockerfile ./Frontend'
+                bat 'docker build --network=host -t backend:latest -f ./devops/docker/backend/Dockerfile ./backend'
             }
         }
 
