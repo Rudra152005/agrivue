@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useState } from "react";
-import { Bell, Lock, User, Plug, Palette, Save } from "lucide-react";
+import { Bell, Lock, User, Plug, Palette, Save, Loader2 } from "lucide-react";
 import { GradientButton } from "@/components/ui-kit/GradientButton";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Agri-TrekOps" }] }),
@@ -31,6 +33,15 @@ function Toggle({ label, defaultOn = false }: { label: string; defaultOn?: boole
 
 function SettingsPage() {
   const [tab, setTab] = useState("profile");
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const res = await api.get("/auth/me");
+      return res.data.data;
+    }
+  });
+
   return (
     <AppLayout title="Settings">
       <div className="grid lg:grid-cols-[240px_1fr] gap-6">
@@ -44,23 +55,38 @@ function SettingsPage() {
           ))}
         </aside>
 
-        <div className="glass rounded-2xl p-6 space-y-5">
+        <div className="glass rounded-2xl p-6 space-y-5 min-h-[400px]">
           {tab==="profile" && (
             <>
               <h3 className="font-semibold text-lg">Profile</h3>
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-xl">AT</div>
-                <div><div className="font-semibold">Admin</div><div className="text-xs text-muted-foreground">officer@agritrek.gov</div></div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                {[["Full name","Admin"],["Email","officer@agritrek.gov"],["Designation","District Officer"],["Region","North · Sector 7-12"]].map(([l,v])=>(
-                  <label key={l} className="block">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">{l}</span>
-                    <input defaultValue={v} className="mt-1.5 w-full glass rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50"/>
-                  </label>
-                ))}
-              </div>
-              <GradientButton><Save className="h-4 w-4"/> Save changes</GradientButton>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-xl uppercase">
+                      {user?.name ? user.name.split(" ").map((s:string)=>s[0]).join("").substring(0,2) : "U"}
+                    </div>
+                    <div><div className="font-semibold capitalize">{user?.name || "Unknown"}</div><div className="text-xs text-muted-foreground capitalize">{user?.role}</div></div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      ["Full name", user?.name || ""],
+                      ["Email", user?.email || ""],
+                      ["Role", (user?.role || "").toUpperCase()],
+                      ["Account Created", new Date(user?.createdAt).toLocaleDateString()]
+                    ].map(([l,v])=>(
+                      <label key={l} className="block">
+                        <span className="text-xs uppercase tracking-wider text-muted-foreground">{l}</span>
+                        <input defaultValue={v} disabled className="mt-1.5 w-full glass rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/50 opacity-80 cursor-not-allowed"/>
+                      </label>
+                    ))}
+                  </div>
+                  <GradientButton><Save className="h-4 w-4"/> Save changes</GradientButton>
+                </>
+              )}
             </>
           )}
           {tab==="security" && (

@@ -23,4 +23,9 @@ export interface AnalyticsData {
   totalLandArea: number;
   applicationsByStatus: { _id: string; count: number }[];
   averageCropHealth: number;
+  totalOfficers?: number;
+  pendingVerifications?: number;
+  totalAlerts?: number;
+  activeDistricts?: number;
+  totalDrones?: number;
 }

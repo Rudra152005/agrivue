@@ -2,6 +2,7 @@ const express = require('express');
 const {
   register,
   login,
+  logout,
   getMe
 } = require('../controllers/auth');
 
@@ -59,6 +60,7 @@ router.post('/register', register);
  *         description: Login successful
  */
 router.post('/login', login);
+router.post('/logout', logout);
 router.get('/me', protect, getMe);
 
 // ─── Google OAuth ──────────────────────────────────────────────────────────

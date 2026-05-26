@@ -23,14 +23,15 @@ export function AnimatedCounter({ value, decimals = 0, suffix = "" }: { value: n
 export function StatCard({
   label, value, icon: Icon, trend, accent = "primary", suffix = "",
 }: {
-  label: string; value: number; icon: LucideIcon; trend?: string;
-  accent?: "primary" | "info" | "warning" | "destructive"; suffix?: string;
+  label: string; value: number | string; icon: LucideIcon; trend?: string;
+  accent?: "primary" | "info" | "warning" | "destructive" | "success"; suffix?: string;
 }) {
   const accentMap: Record<string, string> = {
     primary: "from-emerald/30 to-transparent text-primary",
     info: "from-info/30 to-transparent text-info",
     warning: "from-warning/30 to-transparent text-warning",
     destructive: "from-destructive/30 to-transparent text-destructive",
+    success: "from-success/30 to-transparent text-success",
   };
   return (
     <motion.div
@@ -44,7 +45,11 @@ export function StatCard({
         <div>
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
           <div className="mt-2 text-3xl font-bold text-foreground">
-            <AnimatedCounter value={value} suffix={suffix} />
+            {typeof value === "number" ? (
+              <AnimatedCounter value={value} suffix={suffix} />
+            ) : (
+              <span>{value}{suffix}</span>
+            )}
           </div>
           {trend && <div className="mt-1 text-xs text-success">{trend}</div>}
         </div>

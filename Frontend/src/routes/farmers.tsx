@@ -44,6 +44,18 @@ function FarmersPage() {
     }
   });
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => {
+      const response = await api.put(`/farmers/${id}`, { beneficiaryStatus: status });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["farmers"] });
+      toast.success("Farmer status updated!");
+    },
+    onError: () => toast.error("Failed to update status")
+  });
+
   const farmers = farmersData?.data || [];
   const total = farmersData?.count || 0;
   const pages = Math.max(1, Math.ceil(total / per));
@@ -66,6 +78,33 @@ function FarmersPage() {
     });
   };
 
+  const exportCSV = () => {
+    if (!farmers || farmers.length === 0) return toast.error("No data to export");
+    const headers = ["Name", "Village", "District", "State", "Land Size (Acres)", "Status"];
+    const rows = farmers.map(f => [
+      f.user && typeof f.user === 'object' && f.user.name ? f.user.name : "Unknown",
+      f.village,
+      f.district,
+      f.state,
+      f.landSize,
+      f.beneficiaryStatus
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(e => e.join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "farmers_export.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <AppLayout title="Farmers">
       <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
@@ -74,7 +113,7 @@ function FarmersPage() {
           <p className="text-sm text-muted-foreground">{total} total farmers onboarded</p>
         </div>
         <div className="flex gap-2">
-          <GradientButton variant="outline"><Download className="h-4 w-4"/> Export CSV</GradientButton>
+          <GradientButton variant="outline" onClick={exportCSV}><Download className="h-4 w-4"/> Export CSV</GradientButton>
           <GradientButton onClick={()=>setOpen(true)}><Plus className="h-4 w-4"/> Add farmer</GradientButton>
         </div>
       </div>
@@ -103,14 +142,25 @@ function FarmersPage() {
                   <tr key={f._id} className="hover:bg-accent/20 transition">
                     <td className="py-3 flex items-center gap-2.5">
                       <div className="h-8 w-8 rounded-full bg-gradient-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                        {typeof f.user === 'object' ? f.user.name[0] : 'F'}
+                        {f.user && typeof f.user === 'object' && f.user.name ? f.user.name[0] : 'F'}
                       </div>
-                      {typeof f.user === 'object' ? f.user.name : 'Unknown'}
+                      {f.user && typeof f.user === 'object' && f.user.name ? f.user.name : 'Unknown'}
                     </td>
                     <td>{f.village}</td>
                     <td>{f.district}</td>
                     <td>{f.landSize} acres</td>
-                    <td><span className={`text-xs px-2 py-1 rounded-full ${f.beneficiaryStatus==="active"?"bg-success/15 text-success":f.beneficiaryStatus==="pending"?"bg-warning/15 text-warning":"bg-info/15 text-info"}`}>{f.beneficiaryStatus}</span></td>
+                    <td>
+                      <select 
+                        value={f.beneficiaryStatus} 
+                        onChange={(e) => updateStatusMutation.mutate({ id: f._id, status: e.target.value })}
+                        disabled={updateStatusMutation.isPending}
+                        className={`text-xs px-2 py-1 rounded-full outline-none cursor-pointer appearance-none font-medium text-center ${f.beneficiaryStatus==="active"?"bg-success/15 text-success":f.beneficiaryStatus==="pending"?"bg-warning/15 text-warning":"bg-info/15 text-info"}`}
+                      >
+                        <option value="pending" className="bg-background text-foreground">Pending</option>
+                        <option value="active" className="bg-background text-foreground">Active</option>
+                        <option value="inactive" className="bg-background text-foreground">Inactive</option>
+                      </select>
+                    </td>
                     <td className="text-right"><button className="p-1.5 rounded-lg hover:bg-accent/30"><MoreHorizontal className="h-4 w-4"/></button></td>
                   </tr>
                 ))}

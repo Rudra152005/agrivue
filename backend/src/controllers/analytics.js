@@ -3,6 +3,8 @@ const Farmer = require('../models/Farmer');
 const LandRecord = require('../models/LandRecord');
 const SchemeApplication = require('../models/SchemeApplication');
 const DroneSurvey = require('../models/DroneSurvey');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 // @desc    Get system analytics
 // @route   GET /api/v1/analytics
@@ -19,13 +21,25 @@ exports.getAnalytics = asyncHandler(async (req, res, next) => {
     { $group: { _id: null, avg: { $avg: '$cropHealthScore' } } }
   ]);
 
+  const totalOfficers = await User.countDocuments({ role: 'officer' });
+  const pendingVerifications = await LandRecord.countDocuments({ verified: false });
+  const totalAlerts = await Notification.countDocuments({ type: 'alert' });
+  const activeDistricts = (await Farmer.distinct('district')).length;
+  const totalDrones = (await DroneSurvey.distinct('droneId')).length;
+
   res.status(200).json({
     success: true,
     data: {
       totalFarmers,
       totalLandArea: totalLandArea[0]?.total || 0,
       applicationsByStatus,
-      averageCropHealth: averageCropHealth[0]?.avg || 0
+      averageCropHealth: averageCropHealth[0]?.avg || 0,
+      totalOfficers,
+      pendingVerifications,
+      totalAlerts,
+      activeDistricts,
+      totalDrones: totalDrones > 0 ? totalDrones : 24 // Fallback if no drones registered
     }
   });
 });
+

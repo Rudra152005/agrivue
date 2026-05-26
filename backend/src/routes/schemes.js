@@ -2,14 +2,18 @@ const express = require('express');
 const {
   getSchemes,
   applyForScheme,
-  getApplicationStatus
+  getApplicationStatus,
+  createScheme
 } = require('../controllers/schemes');
 
 const router = express.Router();
 
 const { protect, authorize } = require('../middleware/auth');
 
-router.get('/', getSchemes);
+router.route('/')
+  .get(getSchemes)
+  .post(protect, authorize('admin'), createScheme);
+
 router.post('/apply', protect, authorize('farmer'), applyForScheme);
 router.get('/status', protect, authorize('farmer'), getApplicationStatus);
 

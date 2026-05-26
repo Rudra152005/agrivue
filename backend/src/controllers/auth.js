@@ -16,6 +16,26 @@ exports.register = asyncHandler(async (req, res, next) => {
     role
   });
 
+  // Automatically create a Farmer profile if the role is farmer
+  if (role === 'farmer') {
+    const Farmer = require('../models/Farmer');
+    try {
+      await Farmer.create({
+        user: user._id,
+        aadhaarId: req.body.aadhaarId || Math.floor(100000000000 + Math.random() * 900000000000).toString(),
+        contactNumber: req.body.contactNumber || 'Not Provided',
+        village: 'Unspecified',
+        district: 'Unspecified',
+        state: 'Unspecified',
+        crops: req.body.crops ? (typeof req.body.crops === 'string' ? req.body.crops.split(',').map(c => c.trim()) : req.body.crops) : [],
+        landSize: req.body.landSize ? Number(req.body.landSize) : 0,
+        beneficiaryStatus: 'pending'
+      });
+    } catch (err) {
+      console.error('Failed to create farmer profile during registration', err);
+    }
+  }
+
   sendTokenResponse(user, 201, res);
 });
 
@@ -56,6 +76,16 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: user
+  });
+});
+
+// @desc    Log user out / clear cookie/session (stateless check)
+// @route   POST /api/v1/auth/logout
+// @access  Public
+exports.logout = asyncHandler(async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    data: {}
   });
 });
 

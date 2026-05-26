@@ -14,13 +14,14 @@ services:
     networks:
       - agri-network
 
-  # Backend
   backend:
     build:
       context: ../backend
       dockerfile: ../devops/docker/backend/Dockerfile
     container_name: agri-backend
     restart: always
+    env_file:
+      - ../backend/.env
     environment:
       MONGO_URI: mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASSWORD}@mongodb:27017/agri_db?authSource=admin
       JWT_SECRET: ${JWT_SECRET}

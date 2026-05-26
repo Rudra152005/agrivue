@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { motion } from "framer-motion";
-import { MapPin, Upload, FileText, Plane } from "lucide-react";
+import { MapPin, Upload, FileText, Plane, Loader2 } from "lucide-react";
 import { GradientButton } from "@/components/ui-kit/GradientButton";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/land-records")({
   head: () => ({ meta: [{ title: "Land Records — Agri-TrekOps" }] }),
@@ -19,6 +21,46 @@ const lands = [
 ];
 
 function LandRecords() {
+  const [files, setFiles] = useState<{name: string, size: string}[]>([
+    {name: "Survey-LR1042.pdf", size: "2.4 MB"},
+    {name: "Khasra-LR1044.pdf", size: "1.8 MB"},
+    {name: "Deed-LR1045.pdf", size: "3.2 MB"}
+  ]);
+  const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
+  const processFile = (file: File) => {
+    setUploading(true);
+    setTimeout(() => {
+      setFiles(prev => [{name: file.name, size: (file.size / (1024*1024)).toFixed(1) + ' MB'}, ...prev]);
+      setUploading(false);
+      toast.success("Document uploaded successfully");
+    }, 1500);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0 && !uploading) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFile(e.target.files[0]);
+      e.target.value = "";
+    }
+  };
+
   return (
     <AppLayout title="Land Records">
       <div className="grid lg:grid-cols-3 gap-5">
@@ -52,17 +94,23 @@ function LandRecords() {
         <div className="glass rounded-2xl p-5">
           <h3 className="font-semibold">Upload documents</h3>
           <p className="text-xs text-muted-foreground">Khasra, deeds, survey forms</p>
-          <label className="mt-4 block border-2 border-dashed border-border rounded-2xl p-6 text-center cursor-pointer hover:border-primary transition">
-            <Upload className="h-6 w-6 mx-auto text-muted-foreground"/>
-            <div className="mt-2 text-sm">Drop files or click to upload</div>
+          <label 
+            onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
+            className={`mt-4 block border-2 border-dashed rounded-2xl p-6 text-center transition ${uploading ? 'opacity-50 cursor-not-allowed border-border' : dragActive ? 'border-primary bg-primary/5 cursor-pointer' : 'border-border hover:border-primary cursor-pointer'}`}>
+            {uploading ? (
+              <Loader2 className="h-6 w-6 mx-auto animate-spin text-primary" />
+            ) : (
+              <Upload className={`h-6 w-6 mx-auto ${dragActive ? 'text-primary' : 'text-muted-foreground'}`}/>
+            )}
+            <div className={`mt-2 text-sm ${dragActive ? 'text-primary' : ''}`}>{uploading ? 'Uploading...' : 'Drop files or click to upload'}</div>
             <div className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG · max 25MB</div>
-            <input type="file" className="hidden"/>
+            <input type="file" className="hidden" onChange={handleUpload} disabled={uploading}/>
           </label>
-          <div className="mt-4 space-y-2">
-            {["Survey-LR1042.pdf","Khasra-LR1044.pdf","Deed-LR1045.pdf"].map(n=>(
-              <div key={n} className="flex items-center justify-between glass rounded-xl px-3 py-2 text-sm">
-                <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-info"/>{n}</span>
-                <span className="text-xs text-muted-foreground">2.4 MB</span>
+          <div className="mt-4 space-y-2 max-h-[160px] overflow-y-auto pr-1">
+            {files.map(f=>(
+              <div key={f.name} className="flex items-center justify-between glass rounded-xl px-3 py-2 text-sm">
+                <span className="flex items-center gap-2"><FileText className="h-4 w-4 text-info"/>{f.name}</span>
+                <span className="text-xs text-muted-foreground">{f.size}</span>
               </div>
             ))}
           </div>

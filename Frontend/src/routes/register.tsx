@@ -17,6 +17,8 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Farmer");
+  const [landSize, setLandSize] = useState("");
+  const [crops, setCrops] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -28,9 +30,12 @@ function RegisterPage() {
         name: `${firstName} ${lastName}`, 
         email, 
         password, 
-        role: role.toLowerCase() 
+        role: role.toLowerCase(),
+        landSize: role.toLowerCase() === "farmer" && landSize ? Number(landSize) : undefined,
+        crops: role.toLowerCase() === "farmer" && crops ? crops : undefined
       });
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userRole", role.toLowerCase());
       toast.success("Account created successfully!");
       navigate({ to: "/dashboard" });
     } catch (error: any) {
@@ -51,6 +56,23 @@ function RegisterPage() {
         </div>
         <Field label="Email" type="email" placeholder="you@field.gov" value={email} onChange={(e)=>setEmail(e.target.value)} />
         <Field label="Password" type="password" placeholder="••••••••" value={password} onChange={(e)=>setPassword(e.target.value)} />
+        {role.toLowerCase() === "farmer" && (
+          <div className="grid grid-cols-2 gap-3">
+            <Field 
+              label="Land size (acres)" 
+              type="number" 
+              placeholder="e.g. 5" 
+              value={landSize} 
+              onChange={(e) => setLandSize(e.target.value)} 
+            />
+            <Field 
+              label="Crop types" 
+              placeholder="e.g. Wheat, Rice" 
+              value={crops} 
+              onChange={(e) => setCrops(e.target.value)} 
+            />
+          </div>
+        )}
         <label className="flex items-start gap-2 text-xs text-muted-foreground"><input type="checkbox" className="mt-0.5 accent-primary" required/> I agree to the Terms and Privacy Policy.</label>
         <GradientButton className="w-full" type="submit" disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}

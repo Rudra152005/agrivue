@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 import { motion } from "framer-motion";
 import {
   Leaf, Plane, Users, Activity, ShieldCheck, Sprout, MapPin, Gift,
@@ -20,6 +22,16 @@ export const Route = createFileRoute("/")({
 });
 
 function Nav() {
+  const { data: user } = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const response = await api.get("/auth/me");
+      return response.data.data;
+    },
+    retry: false,
+    enabled: typeof window !== "undefined" && !!localStorage.getItem("token"),
+  });
+
   return (
     <nav className="sticky top-0 z-50 glass-strong border-b border-border">
       <div className="max-w-7xl mx-auto h-16 px-4 sm:px-8 flex items-center justify-between">
@@ -33,9 +45,21 @@ function Nav() {
           <a href="#schemes" className="hover:text-foreground">Schemes</a>
           <a href="#tech" className="hover:text-foreground">Technology</a>
         </div>
-        <div className="flex items-center gap-2">
-          <Link to="/login"><GradientButton variant="ghost">Log in</GradientButton></Link>
-          <Link to="/dashboard"><GradientButton>Launch app <ArrowRight className="h-4 w-4" /></GradientButton></Link>
+        <div className="flex items-center gap-3">
+          {user ? (
+            <Link to="/dashboard" className="flex items-center gap-2.5 focus:outline-none hover:opacity-90 transition-opacity">
+              <div className="h-9 w-9 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-md relative">
+                {user.name?.[0]?.toUpperCase() || 'U'}
+                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-success border-2 border-background animate-pulse" />
+              </div>
+              <span className="hidden sm:inline-block text-sm font-semibold text-foreground hover:text-primary transition-colors">{user.name}</span>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login"><GradientButton variant="ghost">Log in</GradientButton></Link>
+              <Link to="/dashboard"><GradientButton>Launch app <ArrowRight className="h-4 w-4" /></GradientButton></Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

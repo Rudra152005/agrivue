@@ -13,14 +13,17 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OfficersRouteImport } from './routes/officers'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandRecordsRouteImport } from './routes/land-records'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FarmersRouteImport } from './routes/farmers'
+import { Route as DroneSurveillanceRouteImport } from './routes/drone-surveillance'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CropMonitoringRouteImport } from './routes/crop-monitoring'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AiPredictionsRouteImport } from './routes/ai-predictions'
 import { Route as AerialRouteImport } from './routes/aerial'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
@@ -43,6 +46,11 @@ const SchemesRoute = SchemesRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficersRoute = OfficersRouteImport.update({
+  id: '/officers',
+  path: '/officers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -70,6 +78,11 @@ const FarmersRoute = FarmersRouteImport.update({
   path: '/farmers',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DroneSurveillanceRoute = DroneSurveillanceRouteImport.update({
+  id: '/drone-surveillance',
+  path: '/drone-surveillance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -83,6 +96,11 @@ const CropMonitoringRoute = CropMonitoringRouteImport.update({
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiPredictionsRoute = AiPredictionsRouteImport.update({
+  id: '/ai-predictions',
+  path: '/ai-predictions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AerialRoute = AerialRouteImport.update({
@@ -104,14 +122,17 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
+  '/ai-predictions': typeof AiPredictionsRoute
   '/analytics': typeof AnalyticsRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
+  '/drone-surveillance': typeof DroneSurveillanceRoute
   '/farmers': typeof FarmersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/land-records': typeof LandRecordsRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/officers': typeof OfficersRoute
   '/register': typeof RegisterRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
@@ -121,14 +142,17 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
+  '/ai-predictions': typeof AiPredictionsRoute
   '/analytics': typeof AnalyticsRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
+  '/drone-surveillance': typeof DroneSurveillanceRoute
   '/farmers': typeof FarmersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/land-records': typeof LandRecordsRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/officers': typeof OfficersRoute
   '/register': typeof RegisterRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
@@ -139,14 +163,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aerial': typeof AerialRoute
+  '/ai-predictions': typeof AiPredictionsRoute
   '/analytics': typeof AnalyticsRoute
   '/crop-monitoring': typeof CropMonitoringRoute
   '/dashboard': typeof DashboardRoute
+  '/drone-surveillance': typeof DroneSurveillanceRoute
   '/farmers': typeof FarmersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/land-records': typeof LandRecordsRoute
   '/login': typeof LoginRoute
   '/notifications': typeof NotificationsRoute
+  '/officers': typeof OfficersRoute
   '/register': typeof RegisterRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
@@ -158,14 +185,17 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aerial'
+    | '/ai-predictions'
     | '/analytics'
     | '/crop-monitoring'
     | '/dashboard'
+    | '/drone-surveillance'
     | '/farmers'
     | '/forgot-password'
     | '/land-records'
     | '/login'
     | '/notifications'
+    | '/officers'
     | '/register'
     | '/schemes'
     | '/settings'
@@ -175,14 +205,17 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aerial'
+    | '/ai-predictions'
     | '/analytics'
     | '/crop-monitoring'
     | '/dashboard'
+    | '/drone-surveillance'
     | '/farmers'
     | '/forgot-password'
     | '/land-records'
     | '/login'
     | '/notifications'
+    | '/officers'
     | '/register'
     | '/schemes'
     | '/settings'
@@ -192,14 +225,17 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aerial'
+    | '/ai-predictions'
     | '/analytics'
     | '/crop-monitoring'
     | '/dashboard'
+    | '/drone-surveillance'
     | '/farmers'
     | '/forgot-password'
     | '/land-records'
     | '/login'
     | '/notifications'
+    | '/officers'
     | '/register'
     | '/schemes'
     | '/settings'
@@ -210,14 +246,17 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AerialRoute: typeof AerialRoute
+  AiPredictionsRoute: typeof AiPredictionsRoute
   AnalyticsRoute: typeof AnalyticsRoute
   CropMonitoringRoute: typeof CropMonitoringRoute
   DashboardRoute: typeof DashboardRoute
+  DroneSurveillanceRoute: typeof DroneSurveillanceRoute
   FarmersRoute: typeof FarmersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LandRecordsRoute: typeof LandRecordsRoute
   LoginRoute: typeof LoginRoute
   NotificationsRoute: typeof NotificationsRoute
+  OfficersRoute: typeof OfficersRoute
   RegisterRoute: typeof RegisterRoute
   SchemesRoute: typeof SchemesRoute
   SettingsRoute: typeof SettingsRoute
@@ -255,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/officers': {
+      id: '/officers'
+      path: '/officers'
+      fullPath: '/officers'
+      preLoaderRoute: typeof OfficersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notifications': {
       id: '/notifications'
       path: '/notifications'
@@ -290,6 +336,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FarmersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/drone-surveillance': {
+      id: '/drone-surveillance'
+      path: '/drone-surveillance'
+      fullPath: '/drone-surveillance'
+      preLoaderRoute: typeof DroneSurveillanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -309,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-predictions': {
+      id: '/ai-predictions'
+      path: '/ai-predictions'
+      fullPath: '/ai-predictions'
+      preLoaderRoute: typeof AiPredictionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aerial': {
@@ -338,14 +398,17 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AerialRoute: AerialRoute,
+  AiPredictionsRoute: AiPredictionsRoute,
   AnalyticsRoute: AnalyticsRoute,
   CropMonitoringRoute: CropMonitoringRoute,
   DashboardRoute: DashboardRoute,
+  DroneSurveillanceRoute: DroneSurveillanceRoute,
   FarmersRoute: FarmersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LandRecordsRoute: LandRecordsRoute,
   LoginRoute: LoginRoute,
   NotificationsRoute: NotificationsRoute,
+  OfficersRoute: OfficersRoute,
   RegisterRoute: RegisterRoute,
   SchemesRoute: SchemesRoute,
   SettingsRoute: SettingsRoute,

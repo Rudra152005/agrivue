@@ -4,7 +4,7 @@ const DroneSurveySchema = new mongoose.Schema({
   landRecord: {
     type: mongoose.Schema.ObjectId,
     ref: 'LandRecord',
-    required: true
+    required: false
   },
   surveyDate: {
     type: Date,

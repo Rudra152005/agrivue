@@ -32,6 +32,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Handle unauthorized (logout, clear token, etc.)
       localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
       // window.location.href = '/login';
     }
     return Promise.reject(error);

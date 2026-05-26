@@ -17,6 +17,9 @@ const { passport } = require('./config/passport');
 
 const app = express();
 
+// Trust proxy headers for rate-limiting behind Nginx
+app.set('trust proxy', true);
+
 // Initialize passport
 app.use(passport.initialize());
 
@@ -55,6 +58,7 @@ const schemes = require('./routes/schemes');
 const aerial = require('./routes/aerial');
 const analytics = require('./routes/analytics');
 const notifications = require('./routes/notifications');
+const users = require('./routes/users');
 
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/farmers', farmers);
@@ -63,6 +67,7 @@ app.use('/api/v1/schemes', schemes);
 app.use('/api/v1/aerial', aerial);
 app.use('/api/v1/analytics', analytics);
 app.use('/api/v1/notifications', notifications);
+app.use('/api/v1/users', users);
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));

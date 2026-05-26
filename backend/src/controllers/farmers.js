@@ -18,6 +18,13 @@ exports.getFarmers = asyncHandler(async (req, res, next) => {
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach(param => delete reqQuery[param]);
 
+  // Handle name search with regex
+  if (reqQuery.name) {
+    reqQuery.name = { $regex: reqQuery.name, $options: 'i' };
+  } else if (req.query.name === '') {
+    delete reqQuery.name;
+  }
+
   // Create query string
   let queryStr = JSON.stringify(reqQuery);
 
@@ -100,17 +107,34 @@ exports.getFarmer = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/farmers
 // @access  Private
 exports.createFarmer = asyncHandler(async (req, res, next) => {
-  // Add user to req.body
-  req.body.user = req.user.id;
+  let userId = req.user.id;
 
-  // Check for existing farmer profile
-  const existingFarmer = await Farmer.findOne({ user: req.user.id });
-
-  if (existingFarmer && req.user.role !== 'admin') {
-    return next(new ErrorResponse('User already has a farmer profile', 400));
+  if (req.user.role === 'admin' || req.user.role === 'officer') {
+    // Admin/Officer is creating a farmer. Create a User profile first.
+    // Use contactNumber and timestamp as a pseudo-email to guarantee uniqueness
+    const email = `${req.body.contactNumber || 'farmer'}_${Date.now()}@farmer.com`;
+    const password = req.body.contactNumber || '123456'; // Default password
+    
+    const newUser = await User.create({
+      name: req.body.name || 'Unknown Farmer',
+      email,
+      password,
+      role: 'farmer'
+    });
+    userId = newUser._id;
+  } else {
+    // Check for existing farmer profile
+    const existingFarmer = await Farmer.findOne({ user: req.user.id });
+    if (existingFarmer) {
+      return next(new ErrorResponse('User already has a farmer profile', 400));
+    }
   }
 
+  req.body.user = userId;
   const farmer = await Farmer.create(req.body);
+
+  // Populate the user field before sending response so frontend sees the name
+  await farmer.populate('user');
 
   res.status(201).json({
     success: true,

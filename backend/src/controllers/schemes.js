@@ -58,3 +58,17 @@ exports.getApplicationStatus = asyncHandler(async (req, res, next) => {
     data: applications
   });
 });
+
+// @desc    Create new scheme
+// @route   POST /api/v1/schemes
+// @access  Private/Admin
+exports.createScheme = asyncHandler(async (req, res, next) => {
+  req.body.createdBy = req.user.id;
+
+  const scheme = await Scheme.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: scheme
+  });
+});

@@ -98,10 +98,29 @@ function LoginPage() {
     setLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
-      localStorage.setItem("token", response.data.token);
+      const token = response.data.token;
+      
+      // Temporarily store token to allow the profile fetch interceptor to read it
+      localStorage.setItem("token", token);
+      
+      // Fetch user profile to check actual database role
+      const profileRes = await api.get("/auth/me");
+      const actualRole = profileRes.data.data.role; // e.g. "admin", "officer", "farmer"
+      const selectedRoleLower = role.toLowerCase();
+
+      if (actualRole !== selectedRoleLower) {
+        localStorage.removeItem("token");
+        const formattedActualRole = actualRole.charAt(0).toUpperCase() + actualRole.slice(1);
+        toast.error(`The selected role does not match this account's registered role. Please select '${formattedActualRole}' to sign in.`);
+        return;
+      }
+
+      localStorage.setItem("userRole", actualRole);
       toast.success("Login successful!");
       navigate({ to: "/dashboard" });
     } catch (error: any) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userRole");
       toast.error(error.response?.data?.error || "Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
